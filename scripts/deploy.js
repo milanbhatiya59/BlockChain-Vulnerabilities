@@ -25,9 +25,34 @@ async function main() {
 
   console.log("-".repeat(60));
 
+  // ===== SC02: Price Oracle Manipulation =====
+  console.log("\n[SC02] Deploying Price Oracle Manipulation Demo...");
+
+  // Deploy VulnerableDEX with 100 ETH initial liquidity
+  const VulnerableDEX = await ethers.getContractFactory("VulnerableDEX");
+  const vulnerableDEX = await VulnerableDEX.deploy({
+    value: ethers.parseEther("100.0"),
+  });
+  await vulnerableDEX.waitForDeployment();
+  const dexAddress = await vulnerableDEX.getAddress();
+  console.log(`✓ VulnerableDEX deployed to: ${dexAddress}`);
+
+  // Deploy PriceManipulationAttacker
+  const PriceManipulationAttacker = await ethers.getContractFactory(
+    "PriceManipulationAttacker"
+  );
+  const priceAttacker = await PriceManipulationAttacker.deploy(dexAddress);
+  await priceAttacker.waitForDeployment();
+  const priceAttackerAddress = await priceAttacker.getAddress();
+  console.log(
+    `✓ PriceManipulationAttacker deployed to: ${priceAttackerAddress}`
+  );
+
+  console.log("-".repeat(60));
+
   // ===== SC05: Reentrancy Attack =====
   console.log("\n[SC05] Deploying Reentrancy Vulnerability Demo...");
-  
+
   // Deploy VulnerableBank
   const VulnerableBank = await ethers.getContractFactory("VulnerableBank");
   const vulnerableBank = await VulnerableBank.deploy();
@@ -49,6 +74,9 @@ async function main() {
   console.log("SC01 - Access Control:");
   console.log(`  VulnerableWallet: ${walletAddress}`);
   console.log(`  AccessControlAttacker: ${accessAttackerAddress}`);
+  console.log("\nSC02 - Price Oracle Manipulation:");
+  console.log(`  VulnerableDEX: ${dexAddress}`);
+  console.log(`  PriceManipulationAttacker: ${priceAttackerAddress}`);
   console.log("\nSC05 - Reentrancy:");
   console.log(`  VulnerableBank: ${bankAddress}`);
   console.log(`  Attacker: ${attackerAddress}`);

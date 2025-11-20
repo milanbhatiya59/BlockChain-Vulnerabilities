@@ -31,6 +31,16 @@ node static-analysis/SC01_AccessControl.js
 npx hardhat test dynamic-analysis/SC01_AccessControl.js
 ```
 
+### SC02: Price Oracle Manipulation
+
+```bash
+node static-analysis/SC02_PriceOracle.js
+```
+
+```bash
+npx hardhat test dynamic-analysis/SC02_PriceOracle.js
+```
+
 ### SC05: Reentrancy Attack
 
 ```bash
