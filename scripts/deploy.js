@@ -146,6 +146,78 @@ async function main() {
     `✓ UncheckedCallExploiter deployed to: ${uncheckedCallExploiterAddress}`
   );
 
+  console.log("-".repeat(60));
+
+  // ===== SC07: Flash Loan Attacks =====
+  console.log("\n[SC07] Deploying Flash Loan Attack Vulnerability Demo...");
+
+  // Deploy SimpleFlashLoanProvider with 100 ETH initial liquidity
+  const SimpleFlashLoanProvider = await ethers.getContractFactory(
+    "SimpleFlashLoanProvider"
+  );
+  const flashLoanProvider = await SimpleFlashLoanProvider.deploy({
+    value: ethers.parseEther("100.0"),
+  });
+  await flashLoanProvider.waitForDeployment();
+  const flashLoanProviderAddress = await flashLoanProvider.getAddress();
+  console.log(
+    `✓ SimpleFlashLoanProvider deployed to: ${flashLoanProviderAddress}`
+  );
+
+  // Deploy VulnerableGovernance with 50 ETH treasury
+  const VulnerableGovernance = await ethers.getContractFactory(
+    "VulnerableGovernance"
+  );
+  const vulnerableGovernance = await VulnerableGovernance.deploy({
+    value: ethers.parseEther("50.0"),
+  });
+  await vulnerableGovernance.waitForDeployment();
+  const vulnerableGovernanceAddress = await vulnerableGovernance.getAddress();
+  console.log(
+    `✓ VulnerableGovernance deployed to: ${vulnerableGovernanceAddress}`
+  );
+
+  // Deploy VulnerablePriceOracle with 100 ETH
+  const VulnerablePriceOracle = await ethers.getContractFactory(
+    "VulnerablePriceOracle"
+  );
+  const vulnerablePriceOracle = await VulnerablePriceOracle.deploy({
+    value: ethers.parseEther("100.0"),
+  });
+  await vulnerablePriceOracle.waitForDeployment();
+  const vulnerablePriceOracleAddress = await vulnerablePriceOracle.getAddress();
+  console.log(
+    `✓ VulnerablePriceOracle deployed to: ${vulnerablePriceOracleAddress}`
+  );
+
+  // Deploy GovernanceAttacker
+  const GovernanceAttacker = await ethers.getContractFactory(
+    "GovernanceAttacker"
+  );
+  const governanceAttacker = await GovernanceAttacker.deploy(
+    flashLoanProviderAddress,
+    vulnerableGovernanceAddress
+  );
+  await governanceAttacker.waitForDeployment();
+  const governanceAttackerAddress = await governanceAttacker.getAddress();
+  console.log(`✓ GovernanceAttacker deployed to: ${governanceAttackerAddress}`);
+
+  // Deploy PriceManipulationFlashAttacker
+  const PriceManipulationFlashAttacker = await ethers.getContractFactory(
+    "contracts/SC07_Flash_Loan_Attacks/SC07_Flash_Loan_Attacks_Attacker.sol:PriceManipulationFlashAttacker"
+  );
+  const priceManipulationFlashAttacker =
+    await PriceManipulationFlashAttacker.deploy(
+      flashLoanProviderAddress,
+      vulnerablePriceOracleAddress
+    );
+  await priceManipulationFlashAttacker.waitForDeployment();
+  const priceManipulationFlashAttackerAddress =
+    await priceManipulationFlashAttacker.getAddress();
+  console.log(
+    `✓ PriceManipulationFlashAttacker deployed to: ${priceManipulationFlashAttackerAddress}`
+  );
+
   console.log("=".repeat(60));
   console.log("\n✅ All contracts deployed successfully!");
   console.log("\nDeployment Summary:");
@@ -168,6 +240,14 @@ async function main() {
   console.log("\nSC06 - Unchecked External Calls:");
   console.log(`  PaymentProcessor: ${paymentProcessorAddress}`);
   console.log(`  UncheckedCallExploiter: ${uncheckedCallExploiterAddress}`);
+  console.log("\nSC07 - Flash Loan Attacks:");
+  console.log(`  SimpleFlashLoanProvider: ${flashLoanProviderAddress}`);
+  console.log(`  VulnerableGovernance: ${vulnerableGovernanceAddress}`);
+  console.log(`  VulnerablePriceOracle: ${vulnerablePriceOracleAddress}`);
+  console.log(`  GovernanceAttacker: ${governanceAttackerAddress}`);
+  console.log(
+    `  PriceManipulationFlashAttacker: ${priceManipulationFlashAttackerAddress}`
+  );
   console.log("=".repeat(60));
 }
 

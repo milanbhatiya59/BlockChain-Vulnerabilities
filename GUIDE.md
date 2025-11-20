@@ -80,3 +80,13 @@ node static-analysis/SC06_Unchecked_External_Calls.js
 ```bash
 npx hardhat test dynamic-analysis/SC06_Unchecked_External_Calls.js
 ```
+
+### SC07: Flash Loan Attacks
+
+```bash
+node static-analysis/SC07_Flash_Loan_Attacks.js
+```
+
+```bash
+npx hardhat test dynamic-analysis/SC07_Flash_Loan_Attacks.js
+```
