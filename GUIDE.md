@@ -21,6 +21,16 @@ npx hardhat run scripts/deploy.js --network localhost
 
 ## 2. Vulnerabilities
 
+### SC01: Access Control Vulnerabilities
+
+```bash
+node static-analysis/SC01_AccessControl.js
+```
+
+```bash
+npx hardhat test dynamic-analysis/SC01_AccessControl.js
+```
+
 ### SC05: Reentrancy Attack
 
 ```bash
