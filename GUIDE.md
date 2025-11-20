@@ -132,3 +132,9 @@ npx hardhat test dynamic-analysis/Our_Research/Event_State_Mismatch.js
 ```bash
 npx hardhat test dynamic-analysis/Research_Paper/Exploit_Chain_Risk.js
 ```
+
+### Inconsistent State Update
+
+```bash
+npx hardhat test dynamic-analysis/Research_Paper/Inconsistent_State_Update.js
+```

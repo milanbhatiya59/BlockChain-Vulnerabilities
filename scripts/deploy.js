@@ -474,6 +474,95 @@ async function main() {
     `✓ PrivilegeEscalationAttacker deployed to: ${privilegeEscalationAttackerAddress}`
   );
 
+  console.log("-".repeat(60));
+
+  // ===== Research Paper: Inconsistent State Update =====
+  console.log("\n[Research Paper] Deploying Inconsistent State Update Demo...");
+
+  // Deploy InconsistentStateToken
+  const InconsistentStateToken = await ethers.getContractFactory(
+    "InconsistentStateToken"
+  );
+  const inconsistentToken = await InconsistentStateToken.deploy();
+  await inconsistentToken.waitForDeployment();
+  const inconsistentTokenAddress = await inconsistentToken.getAddress();
+  console.log(
+    `✓ InconsistentStateToken deployed to: ${inconsistentTokenAddress}`
+  );
+
+  // Deploy InconsistentVault
+  const InconsistentVault = await ethers.getContractFactory(
+    "InconsistentVault"
+  );
+  const inconsistentVault = await InconsistentVault.deploy();
+  await inconsistentVault.waitForDeployment();
+  const inconsistentVaultAddress = await inconsistentVault.getAddress();
+  console.log(
+    `✓ InconsistentVault deployed to: ${inconsistentVaultAddress}`
+  );
+
+  // Deploy InconsistentRewardPool
+  const InconsistentRewardPool = await ethers.getContractFactory(
+    "InconsistentRewardPool"
+  );
+  const inconsistentRewardPool = await InconsistentRewardPool.deploy();
+  await inconsistentRewardPool.waitForDeployment();
+  const inconsistentRewardPoolAddress =
+    await inconsistentRewardPool.getAddress();
+  console.log(
+    `✓ InconsistentRewardPool deployed to: ${inconsistentRewardPoolAddress}`
+  );
+
+  // Deploy StateCorruptionSystem
+  const StateCorruptionSystem = await ethers.getContractFactory(
+    "StateCorruptionSystem"
+  );
+  const stateCorruptionSystem = await StateCorruptionSystem.deploy();
+  await stateCorruptionSystem.waitForDeployment();
+  const stateCorruptionSystemAddress =
+    await stateCorruptionSystem.getAddress();
+  console.log(
+    `✓ StateCorruptionSystem deployed to: ${stateCorruptionSystemAddress}`
+  );
+
+  // Deploy StateManipulator
+  const StateManipulator = await ethers.getContractFactory("StateManipulator");
+  const stateManipulator = await StateManipulator.deploy(
+    inconsistentTokenAddress
+  );
+  await stateManipulator.waitForDeployment();
+  const stateManipulatorAddress = await stateManipulator.getAddress();
+  console.log(`✓ StateManipulator deployed to: ${stateManipulatorAddress}`);
+
+  // Deploy VaultDrainer
+  const VaultDrainer = await ethers.getContractFactory("VaultDrainer");
+  const vaultDrainer = await VaultDrainer.deploy(inconsistentVaultAddress);
+  await vaultDrainer.waitForDeployment();
+  const vaultDrainerAddress = await vaultDrainer.getAddress();
+  console.log(`✓ VaultDrainer deployed to: ${vaultDrainerAddress}`);
+
+  // Deploy RewardPoolExploiter
+  const RewardPoolExploiter = await ethers.getContractFactory(
+    "RewardPoolExploiter"
+  );
+  const rewardPoolExploiter = await RewardPoolExploiter.deploy(
+    inconsistentRewardPoolAddress
+  );
+  await rewardPoolExploiter.waitForDeployment();
+  const rewardPoolExploiterAddress = await rewardPoolExploiter.getAddress();
+  console.log(
+    `✓ RewardPoolExploiter deployed to: ${rewardPoolExploiterAddress}`
+  );
+
+  // Deploy SystemCorruptor
+  const SystemCorruptor = await ethers.getContractFactory("SystemCorruptor");
+  const systemCorruptor = await SystemCorruptor.deploy(
+    stateCorruptionSystemAddress
+  );
+  await systemCorruptor.waitForDeployment();
+  const systemCorruptorAddress = await systemCorruptor.getAddress();
+  console.log(`✓ SystemCorruptor deployed to: ${systemCorruptorAddress}`);
+
   console.log("=".repeat(60));
   console.log("\n✅ All contracts deployed successfully!");
   console.log("\nDeployment Summary:");
@@ -538,6 +627,15 @@ async function main() {
   console.log(
     `  PrivilegeEscalationAttacker: ${privilegeEscalationAttackerAddress}`
   );
+  console.log("\nResearch Paper - Inconsistent State Update:");
+  console.log(`  InconsistentStateToken: ${inconsistentTokenAddress}`);
+  console.log(`  InconsistentVault: ${inconsistentVaultAddress}`);
+  console.log(`  InconsistentRewardPool: ${inconsistentRewardPoolAddress}`);
+  console.log(`  StateCorruptionSystem: ${stateCorruptionSystemAddress}`);
+  console.log(`  StateManipulator: ${stateManipulatorAddress}`);
+  console.log(`  VaultDrainer: ${vaultDrainerAddress}`);
+  console.log(`  RewardPoolExploiter: ${rewardPoolExploiterAddress}`);
+  console.log(`  SystemCorruptor: ${systemCorruptorAddress}`);
   console.log("=".repeat(60));
 }
 
