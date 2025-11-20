@@ -70,3 +70,13 @@ node static-analysis/SC05_Reentrancy_Attack.js
 ```bash
 npx hardhat test dynamic-analysis/SC05_Reentrancy_Attack.js
 ```
+
+### SC06: Unchecked External Calls
+
+```bash
+node static-analysis/SC06_Unchecked_External_Calls.js
+```
+
+```bash
+npx hardhat test dynamic-analysis/SC06_Unchecked_External_Calls.js
+```

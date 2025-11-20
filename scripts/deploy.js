@@ -120,6 +120,32 @@ async function main() {
   const attackerAddress = await attackerContract.getAddress();
   console.log(`✓ Attacker contract deployed to: ${attackerAddress}`);
 
+  console.log("-".repeat(60));
+
+  // ===== SC06: Unchecked External Calls =====
+  console.log("\n[SC06] Deploying Unchecked External Calls Vulnerability Demo...");
+
+  // Deploy PaymentProcessor
+  const PaymentProcessor = await ethers.getContractFactory("PaymentProcessor");
+  const paymentProcessor = await PaymentProcessor.deploy();
+  await paymentProcessor.waitForDeployment();
+  const paymentProcessorAddress = await paymentProcessor.getAddress();
+  console.log(`✓ PaymentProcessor deployed to: ${paymentProcessorAddress}`);
+
+  // Deploy UncheckedCallExploiter
+  const UncheckedCallExploiter = await ethers.getContractFactory(
+    "UncheckedCallExploiter"
+  );
+  const uncheckedCallExploiter = await UncheckedCallExploiter.deploy(
+    paymentProcessorAddress
+  );
+  await uncheckedCallExploiter.waitForDeployment();
+  const uncheckedCallExploiterAddress =
+    await uncheckedCallExploiter.getAddress();
+  console.log(
+    `✓ UncheckedCallExploiter deployed to: ${uncheckedCallExploiterAddress}`
+  );
+
   console.log("=".repeat(60));
   console.log("\n✅ All contracts deployed successfully!");
   console.log("\nDeployment Summary:");
@@ -139,6 +165,9 @@ async function main() {
   console.log("\nSC05 - Reentrancy:");
   console.log(`  VulnerableBank: ${bankAddress}`);
   console.log(`  Attacker: ${attackerAddress}`);
+  console.log("\nSC06 - Unchecked External Calls:");
+  console.log(`  PaymentProcessor: ${paymentProcessorAddress}`);
+  console.log(`  UncheckedCallExploiter: ${uncheckedCallExploiterAddress}`);
   console.log("=".repeat(60));
 }
 
