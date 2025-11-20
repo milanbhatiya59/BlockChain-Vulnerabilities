@@ -4,7 +4,10 @@ const path = require('path');
 console.log('\n=== SC09: Insecure Randomness - Static Analysis ===\n');
 
 // Paths to contract files
-const contractsDir = path.join(__dirname, '../contracts/SC09_Insecure_Randomness');
+const contractsDir = path.join(
+  __dirname,
+  "../../contracts/SC09_Insecure_Randomness"
+);
 const victimFile = path.join(contractsDir, 'SC09_Insecure_Randomness_Victim.sol');
 const attackerFile = path.join(contractsDir, 'SC09_Insecure_Randomness_Attacker.sol');
 
@@ -331,7 +334,7 @@ console.log('   • Attacker calculates outcome before calling contract');
 console.log('   • Only participates when outcome is favorable');
 console.log('   • Can guarantee wins in games of chance');
 console.log('   • Can mint only rare/valuable NFTs');
-console.log('');
+console.log("")
 
 if (issueCount > 0) {
     console.log('🚨 This contract is intentionally vulnerable for educational purposes.');

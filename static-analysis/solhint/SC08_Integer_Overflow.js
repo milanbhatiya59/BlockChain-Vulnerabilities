@@ -4,7 +4,10 @@ const path = require('path');
 console.log('\n=== SC08: Integer Overflow and Underflow - Static Analysis ===\n');
 
 // Paths to contract files
-const contractsDir = path.join(__dirname, '../contracts/SC08_Integer_Overflow');
+const contractsDir = path.join(
+  __dirname,
+  "../../contracts/SC08_Integer_Overflow"
+);
 const victimFile = path.join(contractsDir, 'SC08_Integer_Overflow_Victim.sol');
 const attackerFile = path.join(contractsDir, 'SC08_Integer_Overflow_Attacker.sol');
 
