@@ -77,6 +77,32 @@ async function main() {
 
   console.log("-".repeat(60));
 
+  // ===== SC04: Lack of Input Validation =====
+  console.log("\n[SC04] Deploying Input Validation Vulnerability Demo...");
+
+  // Deploy TokenSale
+  const TokenSale = await ethers.getContractFactory("TokenSale");
+  const tokenSale = await TokenSale.deploy();
+  await tokenSale.waitForDeployment();
+  const tokenSaleAddress = await tokenSale.getAddress();
+  console.log(`✓ TokenSale deployed to: ${tokenSaleAddress}`);
+
+  // Deploy InputValidationExploiter
+  const InputValidationExploiter = await ethers.getContractFactory(
+    "InputValidationExploiter"
+  );
+  const inputValidationExploiter = await InputValidationExploiter.deploy(
+    tokenSaleAddress
+  );
+  await inputValidationExploiter.waitForDeployment();
+  const inputValidationExploiterAddress =
+    await inputValidationExploiter.getAddress();
+  console.log(
+    `✓ InputValidationExploiter deployed to: ${inputValidationExploiterAddress}`
+  );
+
+  console.log("-".repeat(60));
+
   // ===== SC05: Reentrancy Attack =====
   console.log("\n[SC05] Deploying Reentrancy Vulnerability Demo...");
 
@@ -107,6 +133,9 @@ async function main() {
   console.log("\nSC03 - Logic Errors:");
   console.log(`  UnfairDistribution: ${unfairDistributionAddress}`);
   console.log(`  LogicErrorExploiter: ${logicErrorExploiterAddress}`);
+  console.log("\nSC04 - Lack of Input Validation:");
+  console.log(`  TokenSale: ${tokenSaleAddress}`);
+  console.log(`  InputValidationExploiter: ${inputValidationExploiterAddress}`);
   console.log("\nSC05 - Reentrancy:");
   console.log(`  VulnerableBank: ${bankAddress}`);
   console.log(`  Attacker: ${attackerAddress}`);

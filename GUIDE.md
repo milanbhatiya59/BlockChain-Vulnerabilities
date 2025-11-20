@@ -51,6 +51,16 @@ node static-analysis/SC03_Logic_Errors.js
 npx hardhat test dynamic-analysis/SC03_Logic_Errors.js
 ```
 
+### SC04: Lack of Input Validation
+
+```bash
+node static-analysis/SC04_Input_Validation.js
+```
+
+```bash
+npx hardhat test dynamic-analysis/SC04_Input_Validation.js
+```
+
 ### SC05: Reentrancy Attack
 
 ```bash
