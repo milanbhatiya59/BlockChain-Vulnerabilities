@@ -409,22 +409,32 @@ async function main() {
   const govTokenAddress = await govToken.getAddress();
   console.log(`✓ GovToken deployed to: ${govTokenAddress}`);
 
-  // Deploy ProtocolVault with 50 ETH
+  // Deploy ProtocolVault
   const ProtocolVault = await ethers.getContractFactory("ProtocolVault");
-  const protocolVault = await ProtocolVault.deploy(govTokenAddress, {
-    value: ethers.parseEther("50.0"),
-  });
+  const protocolVault = await ProtocolVault.deploy(govTokenAddress);
   await protocolVault.waitForDeployment();
   const protocolVaultAddress = await protocolVault.getAddress();
   console.log(`✓ ProtocolVault deployed to: ${protocolVaultAddress}`);
+  
+  // Fund ProtocolVault with 50 ETH
+  const [deployer] = await ethers.getSigners();
+  await deployer.sendTransaction({
+    to: protocolVaultAddress,
+    value: ethers.parseEther("50.0"),
+  });
+  console.log(`✓ ProtocolVault funded with 50 ETH`);
 
   // Deploy ExploitChainSystem with 30 ETH
   const ExploitChainSystem = await ethers.getContractFactory(
     "ExploitChainSystem"
   );
-  const exploitChainSystem = await ExploitChainSystem.deploy(govTokenAddress, {
-    value: ethers.parseEther("30.0"),
-  });
+  const exploitChainSystem = await ExploitChainSystem.deploy(
+    govTokenAddress,
+    protocolVaultAddress,
+    {
+      value: ethers.parseEther("30.0"),
+    }
+  );
   await exploitChainSystem.waitForDeployment();
   const exploitChainSystemAddress = await exploitChainSystem.getAddress();
   console.log(`✓ ExploitChainSystem deployed to: ${exploitChainSystemAddress}`);
@@ -433,7 +443,10 @@ async function main() {
   const VulnerableProtocol = await ethers.getContractFactory(
     "VulnerableProtocol"
   );
-  const vulnerableProtocol = await VulnerableProtocol.deploy(govTokenAddress);
+  const vulnerableProtocol = await VulnerableProtocol.deploy(
+    govTokenAddress,
+    protocolVaultAddress
+  );
   await vulnerableProtocol.waitForDeployment();
   const vulnerableProtocolAddress = await vulnerableProtocol.getAddress();
   console.log(`✓ VulnerableProtocol deployed to: ${vulnerableProtocolAddress}`);
@@ -466,7 +479,7 @@ async function main() {
     "PrivilegeEscalationAttacker"
   );
   const privilegeEscalationAttacker =
-    await PrivilegeEscalationAttacker.deploy(vulnerableProtocolAddress);
+    await PrivilegeEscalationAttacker.deploy();
   await privilegeEscalationAttacker.waitForDeployment();
   const privilegeEscalationAttackerAddress =
     await privilegeEscalationAttacker.getAddress();
@@ -563,6 +576,121 @@ async function main() {
   const systemCorruptorAddress = await systemCorruptor.getAddress();
   console.log(`✓ SystemCorruptor deployed to: ${systemCorruptorAddress}`);
 
+  // ========================================================================
+  // Research Paper - Semantic Level Bug
+  // ========================================================================
+  console.log("\n" + "=".repeat(60));
+  console.log("Deploying Research Paper - Semantic Level Bug contracts...");
+  console.log("=".repeat(60));
+
+  console.log("\nDeploying Victim Contracts...");
+
+  // Deploy SemanticOpcodeBugDemo
+  const SemanticOpcodeBugDemo = await ethers.getContractFactory(
+    "SemanticOpcodeBugDemo"
+  );
+  const semanticOpcodeBugDemo = await SemanticOpcodeBugDemo.deploy();
+  await semanticOpcodeBugDemo.waitForDeployment();
+  const semanticOpcodeBugDemoAddress =
+    await semanticOpcodeBugDemo.getAddress();
+  console.log(
+    `✓ SemanticOpcodeBugDemo deployed to: ${semanticOpcodeBugDemoAddress}`
+  );
+
+  // Deploy WrongSlotVault
+  const WrongSlotVault = await ethers.getContractFactory("WrongSlotVault");
+  const wrongSlotVault = await WrongSlotVault.deploy();
+  await wrongSlotVault.waitForDeployment();
+  const wrongSlotVaultAddress = await wrongSlotVault.getAddress();
+  console.log(`✓ WrongSlotVault deployed to: ${wrongSlotVaultAddress}`);
+
+  // Deploy PackedStorageBug
+  const PackedStorageBug = await ethers.getContractFactory("PackedStorageBug");
+  const packedStorageBug = await PackedStorageBug.deploy();
+  await packedStorageBug.waitForDeployment();
+  const packedStorageBugAddress = await packedStorageBug.getAddress();
+  console.log(`✓ PackedStorageBug deployed to: ${packedStorageBugAddress}`);
+
+  // Deploy DynamicArrayBug
+  const DynamicArrayBug = await ethers.getContractFactory("DynamicArrayBug");
+  const dynamicArrayBug = await DynamicArrayBug.deploy();
+  await dynamicArrayBug.waitForDeployment();
+  const dynamicArrayBugAddress = await dynamicArrayBug.getAddress();
+  console.log(`✓ DynamicArrayBug deployed to: ${dynamicArrayBugAddress}`);
+
+  // Deploy SemanticBugSystem
+  const SemanticBugSystem = await ethers.getContractFactory(
+    "SemanticBugSystem"
+  );
+  const semanticBugSystem = await SemanticBugSystem.deploy();
+  await semanticBugSystem.waitForDeployment();
+  const semanticBugSystemAddress = await semanticBugSystem.getAddress();
+  console.log(`✓ SemanticBugSystem deployed to: ${semanticBugSystemAddress}`);
+
+  console.log("\nDeploying Attacker Contracts...");
+
+  // Deploy OpcodeExploiter
+  const OpcodeExploiter = await ethers.getContractFactory("OpcodeExploiter");
+  const opcodeExploiter = await OpcodeExploiter.deploy(
+    semanticOpcodeBugDemoAddress
+  );
+  await opcodeExploiter.waitForDeployment();
+  const opcodeExploiterAddress = await opcodeExploiter.getAddress();
+  console.log(`✓ OpcodeExploiter deployed to: ${opcodeExploiterAddress}`);
+
+  // Deploy VaultStorageAttacker
+  const VaultStorageAttacker = await ethers.getContractFactory(
+    "VaultStorageAttacker"
+  );
+  const vaultStorageAttacker = await VaultStorageAttacker.deploy(
+    wrongSlotVaultAddress
+  );
+  await vaultStorageAttacker.waitForDeployment();
+  const vaultStorageAttackerAddress = await vaultStorageAttacker.getAddress();
+  console.log(
+    `✓ VaultStorageAttacker deployed to: ${vaultStorageAttackerAddress}`
+  );
+
+  // Deploy PackedStorageExploiter
+  const PackedStorageExploiter = await ethers.getContractFactory(
+    "PackedStorageExploiter"
+  );
+  const packedStorageExploiter = await PackedStorageExploiter.deploy(
+    packedStorageBugAddress
+  );
+  await packedStorageExploiter.waitForDeployment();
+  const packedStorageExploiterAddress =
+    await packedStorageExploiter.getAddress();
+  console.log(
+    `✓ PackedStorageExploiter deployed to: ${packedStorageExploiterAddress}`
+  );
+
+  // Deploy ArraySlotExploiter
+  const ArraySlotExploiter = await ethers.getContractFactory(
+    "ArraySlotExploiter"
+  );
+  const arraySlotExploiter = await ArraySlotExploiter.deploy(
+    dynamicArrayBugAddress
+  );
+  await arraySlotExploiter.waitForDeployment();
+  const arraySlotExploiterAddress = await arraySlotExploiter.getAddress();
+  console.log(
+    `✓ ArraySlotExploiter deployed to: ${arraySlotExploiterAddress}`
+  );
+
+  // Deploy SystemWideCorruptor
+  const SystemWideCorruptor = await ethers.getContractFactory(
+    "SystemWideCorruptor"
+  );
+  const systemWideCorruptor = await SystemWideCorruptor.deploy(
+    semanticBugSystemAddress
+  );
+  await systemWideCorruptor.waitForDeployment();
+  const systemWideCorruptorAddress = await systemWideCorruptor.getAddress();
+  console.log(
+    `✓ SystemWideCorruptor deployed to: ${systemWideCorruptorAddress}`
+  );
+
   console.log("=".repeat(60));
   console.log("\n✅ All contracts deployed successfully!");
   console.log("\nDeployment Summary:");
@@ -636,6 +764,17 @@ async function main() {
   console.log(`  VaultDrainer: ${vaultDrainerAddress}`);
   console.log(`  RewardPoolExploiter: ${rewardPoolExploiterAddress}`);
   console.log(`  SystemCorruptor: ${systemCorruptorAddress}`);
+  console.log("\nResearch Paper - Semantic Level Bug:");
+  console.log(`  SemanticOpcodeBugDemo: ${semanticOpcodeBugDemoAddress}`);
+  console.log(`  WrongSlotVault: ${wrongSlotVaultAddress}`);
+  console.log(`  PackedStorageBug: ${packedStorageBugAddress}`);
+  console.log(`  DynamicArrayBug: ${dynamicArrayBugAddress}`);
+  console.log(`  SemanticBugSystem: ${semanticBugSystemAddress}`);
+  console.log(`  OpcodeExploiter: ${opcodeExploiterAddress}`);
+  console.log(`  VaultStorageAttacker: ${vaultStorageAttackerAddress}`);
+  console.log(`  PackedStorageExploiter: ${packedStorageExploiterAddress}`);
+  console.log(`  ArraySlotExploiter: ${arraySlotExploiterAddress}`);
+  console.log(`  SystemWideCorruptor: ${systemWideCorruptorAddress}`);
   console.log("=".repeat(60));
 }
 

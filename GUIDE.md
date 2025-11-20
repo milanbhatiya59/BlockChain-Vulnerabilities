@@ -138,3 +138,10 @@ npx hardhat test dynamic-analysis/Research_Paper/Exploit_Chain_Risk.js
 ```bash
 npx hardhat test dynamic-analysis/Research_Paper/Inconsistent_State_Update.js
 ```
+
+### Semantic Level Bug
+
+```bash
+npx hardhat test dynamic-analysis/Research_Paper/Semantic_Level_Bug.js
+```
+
