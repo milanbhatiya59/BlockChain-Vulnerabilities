@@ -50,6 +50,33 @@ async function main() {
 
   console.log("-".repeat(60));
 
+  // ===== SC03: Logic Errors =====
+  console.log("\n[SC03] Deploying Logic Error Vulnerability Demo...");
+
+  // Deploy UnfairDistribution
+  const UnfairDistribution = await ethers.getContractFactory(
+    "UnfairDistribution"
+  );
+  const unfairDistribution = await UnfairDistribution.deploy();
+  await unfairDistribution.waitForDeployment();
+  const unfairDistributionAddress = await unfairDistribution.getAddress();
+  console.log(`✓ UnfairDistribution deployed to: ${unfairDistributionAddress}`);
+
+  // Deploy LogicErrorExploiter
+  const LogicErrorExploiter = await ethers.getContractFactory(
+    "LogicErrorExploiter"
+  );
+  const logicErrorExploiter = await LogicErrorExploiter.deploy(
+    unfairDistributionAddress
+  );
+  await logicErrorExploiter.waitForDeployment();
+  const logicErrorExploiterAddress = await logicErrorExploiter.getAddress();
+  console.log(
+    `✓ LogicErrorExploiter deployed to: ${logicErrorExploiterAddress}`
+  );
+
+  console.log("-".repeat(60));
+
   // ===== SC05: Reentrancy Attack =====
   console.log("\n[SC05] Deploying Reentrancy Vulnerability Demo...");
 
@@ -77,6 +104,9 @@ async function main() {
   console.log("\nSC02 - Price Oracle Manipulation:");
   console.log(`  VulnerableDEX: ${dexAddress}`);
   console.log(`  PriceManipulationAttacker: ${priceAttackerAddress}`);
+  console.log("\nSC03 - Logic Errors:");
+  console.log(`  UnfairDistribution: ${unfairDistributionAddress}`);
+  console.log(`  LogicErrorExploiter: ${logicErrorExploiterAddress}`);
   console.log("\nSC05 - Reentrancy:");
   console.log(`  VulnerableBank: ${bankAddress}`);
   console.log(`  Attacker: ${attackerAddress}`);

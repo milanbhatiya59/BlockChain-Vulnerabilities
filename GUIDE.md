@@ -41,6 +41,16 @@ node static-analysis/SC02_PriceOracle.js
 npx hardhat test dynamic-analysis/SC02_PriceOracle.js
 ```
 
+### SC03: Logic Errors
+
+```bash
+node static-analysis/SC03_Logic_Errors.js
+```
+
+```bash
+npx hardhat test dynamic-analysis/SC03_Logic_Errors.js
+```
+
 ### SC05: Reentrancy Attack
 
 ```bash
