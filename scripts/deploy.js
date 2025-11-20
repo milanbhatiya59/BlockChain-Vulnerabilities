@@ -218,6 +218,112 @@ async function main() {
     `✓ PriceManipulationFlashAttacker deployed to: ${priceManipulationFlashAttackerAddress}`
   );
 
+  console.log("-".repeat(60));
+
+  // ===== SC08: Integer Overflow and Underflow =====
+  console.log("\n[SC08] Deploying Integer Overflow and Underflow Vulnerability Demo...");
+
+  // Deploy IntegerOverflowVictim
+  const IntegerOverflowVictim = await ethers.getContractFactory(
+    "IntegerOverflowVictim"
+  );
+  const integerOverflowVictim = await IntegerOverflowVictim.deploy();
+  await integerOverflowVictim.waitForDeployment();
+  const integerOverflowVictimAddress = await integerOverflowVictim.getAddress();
+  console.log(
+    `✓ IntegerOverflowVictim deployed to: ${integerOverflowVictimAddress}`
+  );
+
+  // Deploy TimeLockVictim
+  const TimeLockVictim = await ethers.getContractFactory("TimeLockVictim");
+  const timeLockVictim = await TimeLockVictim.deploy();
+  await timeLockVictim.waitForDeployment();
+  const timeLockVictimAddress = await timeLockVictim.getAddress();
+  console.log(`✓ TimeLockVictim deployed to: ${timeLockVictimAddress}`);
+
+  // Deploy IntegerOverflowAttacker
+  const IntegerOverflowAttacker = await ethers.getContractFactory(
+    "IntegerOverflowAttacker"
+  );
+  const integerOverflowAttacker = await IntegerOverflowAttacker.deploy(
+    integerOverflowVictimAddress
+  );
+  await integerOverflowAttacker.waitForDeployment();
+  const integerOverflowAttackerAddress =
+    await integerOverflowAttacker.getAddress();
+  console.log(
+    `✓ IntegerOverflowAttacker deployed to: ${integerOverflowAttackerAddress}`
+  );
+
+  // Deploy TimeLockAttacker
+  const TimeLockAttacker = await ethers.getContractFactory("TimeLockAttacker");
+  const timeLockAttacker = await TimeLockAttacker.deploy(timeLockVictimAddress);
+  await timeLockAttacker.waitForDeployment();
+  const timeLockAttackerAddress = await timeLockAttacker.getAddress();
+  console.log(`✓ TimeLockAttacker deployed to: ${timeLockAttackerAddress}`);
+
+  console.log("-".repeat(60));
+
+  // ===== Our Research: Semantic State Drift =====
+  console.log("\n[Our Research] Deploying Semantic State Drift Demo...");
+
+  // Deploy Semantic State Drift Victim with 1000 ETH
+  const SemanticStateDriftVictim = await ethers.getContractFactory(
+    "SemanticStateDriftVictim"
+  );
+  const semanticDriftVictim = await SemanticStateDriftVictim.deploy({
+    value: ethers.parseEther("1000.0"),
+  });
+  await semanticDriftVictim.waitForDeployment();
+  const semanticDriftVictimAddress = await semanticDriftVictim.getAddress();
+  console.log(
+    `✓ SemanticStateDriftVictim deployed to: ${semanticDriftVictimAddress}`
+  );
+
+  // Deploy Semantic State Drift Exploiter
+  const SemanticStateDriftExploiter = await ethers.getContractFactory(
+    "SemanticStateDriftExploiter"
+  );
+  const semanticDriftExploiter = await SemanticStateDriftExploiter.deploy(
+    semanticDriftVictimAddress
+  );
+  await semanticDriftExploiter.waitForDeployment();
+  const semanticDriftExploiterAddress =
+    await semanticDriftExploiter.getAddress();
+  console.log(
+    `✓ SemanticStateDriftExploiter deployed to: ${semanticDriftExploiterAddress}`
+  );
+
+  console.log("-".repeat(60));
+
+  // ===== Our Research: Event-State Mismatch =====
+  console.log("\n[Our Research] Deploying Event-State Mismatch Demo...");
+
+  // Deploy Event-State Mismatch Victim
+  const EventStateMismatchVictim = await ethers.getContractFactory(
+    "EventStateMismatchVictim"
+  );
+  const eventMismatchVictim = await EventStateMismatchVictim.deploy();
+  await eventMismatchVictim.waitForDeployment();
+  const eventMismatchVictimAddress = await eventMismatchVictim.getAddress();
+  console.log(
+    `✓ EventStateMismatchVictim deployed to: ${eventMismatchVictimAddress}`
+  );
+
+  // Deploy Event-State Mismatch Exploiter
+  const EventStateMismatchExploiter = await ethers.getContractFactory(
+    "EventStateMismatchExploiter"
+  );
+  const eventMismatchExploiter = await EventStateMismatchExploiter.deploy(
+    eventMismatchVictimAddress
+  );
+  await eventMismatchExploiter.waitForDeployment();
+  const eventMismatchExploiterAddress =
+    await eventMismatchExploiter.getAddress();
+  console.log(
+    `✓ EventStateMismatchExploiter deployed to: ${eventMismatchExploiterAddress}`
+  );
+
   console.log("=".repeat(60));
   console.log("\n✅ All contracts deployed successfully!");
   console.log("\nDeployment Summary:");
@@ -247,6 +353,21 @@ async function main() {
   console.log(`  GovernanceAttacker: ${governanceAttackerAddress}`);
   console.log(
     `  PriceManipulationFlashAttacker: ${priceManipulationFlashAttackerAddress}`
+  );
+  console.log("\nSC08 - Integer Overflow and Underflow:");
+  console.log(`  IntegerOverflowVictim: ${integerOverflowVictimAddress}`);
+  console.log(`  TimeLockVictim: ${timeLockVictimAddress}`);
+  console.log(`  IntegerOverflowAttacker: ${integerOverflowAttackerAddress}`);
+  console.log(`  TimeLockAttacker: ${timeLockAttackerAddress}`);
+  console.log("\nOur Research - Semantic State Drift:");
+  console.log(`  SemanticStateDriftVictim: ${semanticDriftVictimAddress}`);
+  console.log(
+    `  SemanticStateDriftExploiter: ${semanticDriftExploiterAddress}`
+  );
+  console.log("\nOur Research - Event-State Mismatch:");
+  console.log(`  EventStateMismatchVictim: ${eventMismatchVictimAddress}`);
+  console.log(
+    `  EventStateMismatchExploiter: ${eventMismatchExploiterAddress}`
   );
   console.log("=".repeat(60));
 }

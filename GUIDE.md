@@ -90,3 +90,27 @@ node static-analysis/SC07_Flash_Loan_Attacks.js
 ```bash
 npx hardhat test dynamic-analysis/SC07_Flash_Loan_Attacks.js
 ```
+
+### SC08: Integer Overflow and Underflow
+
+```bash
+node static-analysis/SC08_Integer_Overflow.js
+```
+
+```bash
+npx hardhat test dynamic-analysis/SC08_Integer_Overflow.js
+```
+
+## 3. Our Research
+
+### Semantic State Drift
+
+```bash
+npx hardhat test dynamic-analysis/Our_Research/Semantic_State_Drift.js
+```
+
+### Event-State Mismatch
+
+```bash
+npx hardhat test dynamic-analysis/Our_Research/Event_State_Mismatch.js
+```
