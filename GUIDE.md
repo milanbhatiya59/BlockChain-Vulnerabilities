@@ -124,3 +124,11 @@ npx hardhat test dynamic-analysis/Our_Research/Semantic_State_Drift.js
 ```bash
 npx hardhat test dynamic-analysis/Our_Research/Event_State_Mismatch.js
 ```
+
+## 4. Research Paper
+
+### Exploit Chain Risk
+
+```bash
+npx hardhat test dynamic-analysis/Research_Paper/Exploit_Chain_Risk.js
+```

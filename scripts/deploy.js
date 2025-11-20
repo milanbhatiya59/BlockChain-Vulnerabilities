@@ -397,6 +397,83 @@ async function main() {
     `✓ EventStateMismatchExploiter deployed to: ${eventMismatchExploiterAddress}`
   );
 
+  console.log("-".repeat(60));
+
+  // ===== Research Paper: Exploit Chain Risk =====
+  console.log("\n[Research Paper] Deploying Exploit Chain Risk Demo...");
+
+  // Deploy GovToken
+  const GovToken = await ethers.getContractFactory("GovToken");
+  const govToken = await GovToken.deploy();
+  await govToken.waitForDeployment();
+  const govTokenAddress = await govToken.getAddress();
+  console.log(`✓ GovToken deployed to: ${govTokenAddress}`);
+
+  // Deploy ProtocolVault with 50 ETH
+  const ProtocolVault = await ethers.getContractFactory("ProtocolVault");
+  const protocolVault = await ProtocolVault.deploy(govTokenAddress, {
+    value: ethers.parseEther("50.0"),
+  });
+  await protocolVault.waitForDeployment();
+  const protocolVaultAddress = await protocolVault.getAddress();
+  console.log(`✓ ProtocolVault deployed to: ${protocolVaultAddress}`);
+
+  // Deploy ExploitChainSystem with 30 ETH
+  const ExploitChainSystem = await ethers.getContractFactory(
+    "ExploitChainSystem"
+  );
+  const exploitChainSystem = await ExploitChainSystem.deploy(govTokenAddress, {
+    value: ethers.parseEther("30.0"),
+  });
+  await exploitChainSystem.waitForDeployment();
+  const exploitChainSystemAddress = await exploitChainSystem.getAddress();
+  console.log(`✓ ExploitChainSystem deployed to: ${exploitChainSystemAddress}`);
+
+  // Deploy VulnerableProtocol
+  const VulnerableProtocol = await ethers.getContractFactory(
+    "VulnerableProtocol"
+  );
+  const vulnerableProtocol = await VulnerableProtocol.deploy(govTokenAddress);
+  await vulnerableProtocol.waitForDeployment();
+  const vulnerableProtocolAddress = await vulnerableProtocol.getAddress();
+  console.log(`✓ VulnerableProtocol deployed to: ${vulnerableProtocolAddress}`);
+
+  // Deploy ExploitChainAttacker
+  const ExploitChainAttacker = await ethers.getContractFactory(
+    "ExploitChainAttacker"
+  );
+  const exploitChainAttacker = await ExploitChainAttacker.deploy(
+    govTokenAddress,
+    protocolVaultAddress
+  );
+  await exploitChainAttacker.waitForDeployment();
+  const exploitChainAttackerAddress = await exploitChainAttacker.getAddress();
+  console.log(
+    `✓ ExploitChainAttacker deployed to: ${exploitChainAttackerAddress}`
+  );
+
+  // Deploy SystemExploiter
+  const SystemExploiter = await ethers.getContractFactory("SystemExploiter");
+  const systemExploiter = await SystemExploiter.deploy(
+    exploitChainSystemAddress
+  );
+  await systemExploiter.waitForDeployment();
+  const systemExploiterAddress = await systemExploiter.getAddress();
+  console.log(`✓ SystemExploiter deployed to: ${systemExploiterAddress}`);
+
+  // Deploy PrivilegeEscalationAttacker
+  const PrivilegeEscalationAttacker = await ethers.getContractFactory(
+    "PrivilegeEscalationAttacker"
+  );
+  const privilegeEscalationAttacker =
+    await PrivilegeEscalationAttacker.deploy(vulnerableProtocolAddress);
+  await privilegeEscalationAttacker.waitForDeployment();
+  const privilegeEscalationAttackerAddress =
+    await privilegeEscalationAttacker.getAddress();
+  console.log(
+    `✓ PrivilegeEscalationAttacker deployed to: ${privilegeEscalationAttackerAddress}`
+  );
+
   console.log("=".repeat(60));
   console.log("\n✅ All contracts deployed successfully!");
   console.log("\nDeployment Summary:");
@@ -450,6 +527,16 @@ async function main() {
   console.log(`  EventStateMismatchVictim: ${eventMismatchVictimAddress}`);
   console.log(
     `  EventStateMismatchExploiter: ${eventMismatchExploiterAddress}`
+  );
+  console.log("\nResearch Paper - Exploit Chain Risk:");
+  console.log(`  GovToken: ${govTokenAddress}`);
+  console.log(`  ProtocolVault: ${protocolVaultAddress}`);
+  console.log(`  ExploitChainSystem: ${exploitChainSystemAddress}`);
+  console.log(`  VulnerableProtocol: ${vulnerableProtocolAddress}`);
+  console.log(`  ExploitChainAttacker: ${exploitChainAttackerAddress}`);
+  console.log(`  SystemExploiter: ${systemExploiterAddress}`);
+  console.log(
+    `  PrivilegeEscalationAttacker: ${privilegeEscalationAttackerAddress}`
   );
   console.log("=".repeat(60));
 }
