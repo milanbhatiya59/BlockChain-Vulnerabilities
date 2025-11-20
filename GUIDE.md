@@ -101,6 +101,16 @@ node static-analysis/SC08_Integer_Overflow.js
 npx hardhat test dynamic-analysis/SC08_Integer_Overflow.js
 ```
 
+### SC09: Insecure Randomness
+
+```bash
+node static-analysis/SC09_Insecure_Randomness.js
+```
+
+```bash
+npx hardhat test dynamic-analysis/SC09_Insecure_Randomness.js
+```
+
 ## 3. Our Research
 
 ### Semantic State Drift

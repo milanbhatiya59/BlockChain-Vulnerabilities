@@ -123,7 +123,9 @@ async function main() {
   console.log("-".repeat(60));
 
   // ===== SC06: Unchecked External Calls =====
-  console.log("\n[SC06] Deploying Unchecked External Calls Vulnerability Demo...");
+  console.log(
+    "\n[SC06] Deploying Unchecked External Calls Vulnerability Demo..."
+  );
 
   // Deploy PaymentProcessor
   const PaymentProcessor = await ethers.getContractFactory("PaymentProcessor");
@@ -221,7 +223,9 @@ async function main() {
   console.log("-".repeat(60));
 
   // ===== SC08: Integer Overflow and Underflow =====
-  console.log("\n[SC08] Deploying Integer Overflow and Underflow Vulnerability Demo...");
+  console.log(
+    "\n[SC08] Deploying Integer Overflow and Underflow Vulnerability Demo..."
+  );
 
   // Deploy IntegerOverflowVictim
   const IntegerOverflowVictim = await ethers.getContractFactory(
@@ -261,6 +265,75 @@ async function main() {
   await timeLockAttacker.waitForDeployment();
   const timeLockAttackerAddress = await timeLockAttacker.getAddress();
   console.log(`✓ TimeLockAttacker deployed to: ${timeLockAttackerAddress}`);
+
+  console.log("-".repeat(60));
+
+  // ===== SC09: Insecure Randomness =====
+  console.log("\n[SC09] Deploying Insecure Randomness Vulnerability Demo...");
+
+  // Deploy InsecureRandomnessVictim with 10 ETH initial jackpot
+  const InsecureRandomnessVictim = await ethers.getContractFactory(
+    "InsecureRandomnessVictim"
+  );
+  const insecureRandomnessVictim = await InsecureRandomnessVictim.deploy({
+    value: ethers.parseEther("10.0"),
+  });
+  await insecureRandomnessVictim.waitForDeployment();
+  const insecureRandomnessVictimAddress =
+    await insecureRandomnessVictim.getAddress();
+  console.log(
+    `✓ InsecureRandomnessVictim deployed to: ${insecureRandomnessVictimAddress}`
+  );
+
+  // Deploy VulnerableNFTMint
+  const VulnerableNFTMint = await ethers.getContractFactory(
+    "VulnerableNFTMint"
+  );
+  const vulnerableNFTMint = await VulnerableNFTMint.deploy();
+  await vulnerableNFTMint.waitForDeployment();
+  const vulnerableNFTMintAddress = await vulnerableNFTMint.getAddress();
+  console.log(`✓ VulnerableNFTMint deployed to: ${vulnerableNFTMintAddress}`);
+
+  // Deploy VulnerableCoinFlip
+  const VulnerableCoinFlip = await ethers.getContractFactory(
+    "VulnerableCoinFlip"
+  );
+  const vulnerableCoinFlip = await VulnerableCoinFlip.deploy();
+  await vulnerableCoinFlip.waitForDeployment();
+  const vulnerableCoinFlipAddress = await vulnerableCoinFlip.getAddress();
+  console.log(`✓ VulnerableCoinFlip deployed to: ${vulnerableCoinFlipAddress}`);
+
+  // Deploy InsecureRandomnessAttacker
+  const InsecureRandomnessAttacker = await ethers.getContractFactory(
+    "InsecureRandomnessAttacker"
+  );
+  const insecureRandomnessAttacker = await InsecureRandomnessAttacker.deploy(
+    insecureRandomnessVictimAddress
+  );
+  await insecureRandomnessAttacker.waitForDeployment();
+  const insecureRandomnessAttackerAddress =
+    await insecureRandomnessAttacker.getAddress();
+  console.log(
+    `✓ InsecureRandomnessAttacker deployed to: ${insecureRandomnessAttackerAddress}`
+  );
+
+  // Deploy NFTMintAttacker
+  const NFTMintAttacker = await ethers.getContractFactory("NFTMintAttacker");
+  const nftMintAttacker = await NFTMintAttacker.deploy(
+    vulnerableNFTMintAddress
+  );
+  await nftMintAttacker.waitForDeployment();
+  const nftMintAttackerAddress = await nftMintAttacker.getAddress();
+  console.log(`✓ NFTMintAttacker deployed to: ${nftMintAttackerAddress}`);
+
+  // Deploy CoinFlipAttacker
+  const CoinFlipAttacker = await ethers.getContractFactory("CoinFlipAttacker");
+  const coinFlipAttacker = await CoinFlipAttacker.deploy(
+    vulnerableCoinFlipAddress
+  );
+  await coinFlipAttacker.waitForDeployment();
+  const coinFlipAttackerAddress = await coinFlipAttacker.getAddress();
+  console.log(`✓ CoinFlipAttacker deployed to: ${coinFlipAttackerAddress}`);
 
   console.log("-".repeat(60));
 
@@ -359,6 +432,15 @@ async function main() {
   console.log(`  TimeLockVictim: ${timeLockVictimAddress}`);
   console.log(`  IntegerOverflowAttacker: ${integerOverflowAttackerAddress}`);
   console.log(`  TimeLockAttacker: ${timeLockAttackerAddress}`);
+  console.log("\nSC09 - Insecure Randomness:");
+  console.log(`  InsecureRandomnessVictim: ${insecureRandomnessVictimAddress}`);
+  console.log(`  VulnerableNFTMint: ${vulnerableNFTMintAddress}`);
+  console.log(`  VulnerableCoinFlip: ${vulnerableCoinFlipAddress}`);
+  console.log(
+    `  InsecureRandomnessAttacker: ${insecureRandomnessAttackerAddress}`
+  );
+  console.log(`  NFTMintAttacker: ${nftMintAttackerAddress}`);
+  console.log(`  CoinFlipAttacker: ${coinFlipAttackerAddress}`);
   console.log("\nOur Research - Semantic State Drift:");
   console.log(`  SemanticStateDriftVictim: ${semanticDriftVictimAddress}`);
   console.log(
