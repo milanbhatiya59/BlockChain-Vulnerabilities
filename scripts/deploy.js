@@ -691,6 +691,122 @@ async function main() {
     `✓ SystemWideCorruptor deployed to: ${systemWideCorruptorAddress}`
   );
 
+  // ========================================================================
+  // Research Paper - State Machine Dependency
+  // ========================================================================
+  console.log("\n" + "=".repeat(60));
+  console.log("Deploying Research Paper - State Machine Dependency contracts...");
+  console.log("=".repeat(60));
+
+  console.log("\nDeploying Victim Contracts...");
+
+  // Deploy FragileEscrow
+  const FragileEscrow = await ethers.getContractFactory("FragileEscrow");
+  const fragileEscrow = await FragileEscrow.deploy(processor.address);
+  await fragileEscrow.waitForDeployment();
+  const fragileEscrowAddress = await fragileEscrow.getAddress();
+  console.log(`✓ FragileEscrow deployed to: ${fragileEscrowAddress}`);
+
+  // Deploy MultiStageVoting
+  const MultiStageVoting = await ethers.getContractFactory("MultiStageVoting");
+  const multiStageVoting = await MultiStageVoting.deploy();
+  await multiStageVoting.waitForDeployment();
+  const multiStageVotingAddress = await multiStageVoting.getAddress();
+  console.log(`✓ MultiStageVoting deployed to: ${multiStageVotingAddress}`);
+
+  // Deploy TimedAuction (1 hour bidding, 30 min reveal)
+  const TimedAuction = await ethers.getContractFactory("TimedAuction");
+  const timedAuction = await TimedAuction.deploy(3600, 1800);
+  await timedAuction.waitForDeployment();
+  const timedAuctionAddress = await timedAuction.getAddress();
+  console.log(`✓ TimedAuction deployed to: ${timedAuctionAddress}`);
+
+  // Deploy StateMachineDependencySystem
+  const StateMachineDependencySystem = await ethers.getContractFactory(
+    "StateMachineDependencySystem"
+  );
+  const stateMachineSystem = await StateMachineDependencySystem.deploy(
+    processor.address,
+    3600,
+    1800
+  );
+  await stateMachineSystem.waitForDeployment();
+  const stateMachineSystemAddress = await stateMachineSystem.getAddress();
+  console.log(
+    `✓ StateMachineDependencySystem deployed to: ${stateMachineSystemAddress}`
+  );
+
+  console.log("\nDeploying Attacker Contracts...");
+
+  // Deploy EscrowReentrancyAttacker
+  const EscrowReentrancyAttacker = await ethers.getContractFactory(
+    "EscrowReentrancyAttacker"
+  );
+  const escrowReentrancyAttacker = await EscrowReentrancyAttacker.deploy(
+    fragileEscrowAddress
+  );
+  await escrowReentrancyAttacker.waitForDeployment();
+  const escrowReentrancyAttackerAddress =
+    await escrowReentrancyAttacker.getAddress();
+  console.log(
+    `✓ EscrowReentrancyAttacker deployed to: ${escrowReentrancyAttackerAddress}`
+  );
+
+  // Deploy VotingManipulationAttacker
+  const VotingManipulationAttacker = await ethers.getContractFactory(
+    "VotingManipulationAttacker"
+  );
+  const votingManipulationAttacker = await VotingManipulationAttacker.deploy(
+    multiStageVotingAddress
+  );
+  await votingManipulationAttacker.waitForDeployment();
+  const votingManipulationAttackerAddress =
+    await votingManipulationAttacker.getAddress();
+  console.log(
+    `✓ VotingManipulationAttacker deployed to: ${votingManipulationAttackerAddress}`
+  );
+
+  // Deploy AuctionTimingAttacker
+  const AuctionTimingAttacker = await ethers.getContractFactory(
+    "AuctionTimingAttacker"
+  );
+  const auctionTimingAttacker = await AuctionTimingAttacker.deploy(
+    timedAuctionAddress
+  );
+  await auctionTimingAttacker.waitForDeployment();
+  const auctionTimingAttackerAddress =
+    await auctionTimingAttacker.getAddress();
+  console.log(
+    `✓ AuctionTimingAttacker deployed to: ${auctionTimingAttackerAddress}`
+  );
+
+  // Deploy ProcessorImpersonator
+  const ProcessorImpersonator = await ethers.getContractFactory(
+    "ProcessorImpersonator"
+  );
+  const processorImpersonator = await ProcessorImpersonator.deploy(
+    fragileEscrowAddress
+  );
+  await processorImpersonator.waitForDeployment();
+  const processorImpersonatorAddress =
+    await processorImpersonator.getAddress();
+  console.log(
+    `✓ ProcessorImpersonator deployed to: ${processorImpersonatorAddress}`
+  );
+
+  // Deploy SystemWideStateMachineAttacker
+  const SystemWideStateMachineAttacker = await ethers.getContractFactory(
+    "SystemWideStateMachineAttacker"
+  );
+  const systemWideStateMachineAttacker =
+    await SystemWideStateMachineAttacker.deploy(stateMachineSystemAddress);
+  await systemWideStateMachineAttacker.waitForDeployment();
+  const systemWideStateMachineAttackerAddress =
+    await systemWideStateMachineAttacker.getAddress();
+  console.log(
+    `✓ SystemWideStateMachineAttacker deployed to: ${systemWideStateMachineAttackerAddress}`
+  );
+
   console.log("=".repeat(60));
   console.log("\n✅ All contracts deployed successfully!");
   console.log("\nDeployment Summary:");
@@ -775,6 +891,22 @@ async function main() {
   console.log(`  PackedStorageExploiter: ${packedStorageExploiterAddress}`);
   console.log(`  ArraySlotExploiter: ${arraySlotExploiterAddress}`);
   console.log(`  SystemWideCorruptor: ${systemWideCorruptorAddress}`);
+  console.log("\nResearch Paper - State Machine Dependency:");
+  console.log(`  FragileEscrow: ${fragileEscrowAddress}`);
+  console.log(`  MultiStageVoting: ${multiStageVotingAddress}`);
+  console.log(`  TimedAuction: ${timedAuctionAddress}`);
+  console.log(`  StateMachineDependencySystem: ${stateMachineSystemAddress}`);
+  console.log(
+    `  EscrowReentrancyAttacker: ${escrowReentrancyAttackerAddress}`
+  );
+  console.log(
+    `  VotingManipulationAttacker: ${votingManipulationAttackerAddress}`
+  );
+  console.log(`  AuctionTimingAttacker: ${auctionTimingAttackerAddress}`);
+  console.log(`  ProcessorImpersonator: ${processorImpersonatorAddress}`);
+  console.log(
+    `  SystemWideStateMachineAttacker: ${systemWideStateMachineAttackerAddress}`
+  );
   console.log("=".repeat(60));
 }
 

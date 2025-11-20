@@ -145,3 +145,9 @@ npx hardhat test dynamic-analysis/Research_Paper/Inconsistent_State_Update.js
 npx hardhat test dynamic-analysis/Research_Paper/Semantic_Level_Bug.js
 ```
 
+### State Machine Dependency
+
+```bash
+npx hardhat test dynamic-analysis/Research_Paper/State_Machine_Dependency.js
+```
+
