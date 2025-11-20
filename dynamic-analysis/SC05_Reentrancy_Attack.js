@@ -1,50 +1,57 @@
 const { ethers } = require("hardhat");
+const fc = require("fast-check");
+const { expect } = require("chai");
 
-async function main() {
-  const [owner, attackerSigner] = await ethers.getSigners();
+describe("Reentrancy Fuzzing", function () {
+  let VulnerableBank, Attacker;
+  let owner, attackerSigner;
 
-  // Deploy VulnerableBank
-  const VulnerableBank = await ethers.getContractFactory("VulnerableBank");
-  const vulnerableBank = await VulnerableBank.deploy();
-  await vulnerableBank.waitForDeployment();
-  const bankAddress = await vulnerableBank.getAddress();
-  console.log(`VulnerableBank deployed to: ${bankAddress}`);
+  before(async () => {
+    [owner, attackerSigner] = await ethers.getSigners();
+    VulnerableBank = await ethers.getContractFactory("VulnerableBank");
+    Attacker = await ethers.getContractFactory("Attacker");
+  });
 
-  // Deploy Attacker
-  const Attacker = await ethers.getContractFactory("Attacker");
-  const attackerContract = await Attacker.deploy(bankAddress);
-  await attackerContract.waitForDeployment();
-  const attackerAddress = await attackerContract.getAddress();
-  console.log(`Attacker contract deployed to: ${attackerAddress}`);
+  it("should drain the bank's funds when the attacker deposits a random amount", async () => {
+    await fc.assert(
+      fc.asyncProperty(
+        fc.integer({ min: 1, max: 5 }),
+        async (depositAmount) => {
+          // Deploy contracts for each test run
+          const vulnerableBank = await VulnerableBank.deploy();
+          await vulnerableBank.waitForDeployment();
+          const bankAddress = await vulnerableBank.getAddress();
 
-  // Fund the VulnerableBank with 10 ETH from the owner
-  console.log("Depositing 10 ETH into VulnerableBank...");
-  const depositTx = await vulnerableBank.connect(owner).deposit({ value: ethers.parseEther("10.0") });
-  await depositTx.wait();
+          const attackerContract = await Attacker.deploy(bankAddress);
+          await attackerContract.waitForDeployment();
 
-  let bankBalance = await ethers.provider.getBalance(bankAddress);
-  console.log(`Bank balance before attack: ${ethers.formatEther(bankBalance)} ETH`);
+          // Fund the bank
+          const fundTx = await vulnerableBank
+            .connect(owner)
+            .deposit({ value: ethers.parseEther("10.0") });
+          await fundTx.wait();
 
-  // Start the attack
-  console.log("Starting the attack from the Attacker contract...");
-  const attackTx = await attackerContract.connect(attackerSigner).attack({ value: ethers.parseEther("1.0") });
-  await attackTx.wait();
+          // Perform the attack with a random deposit amount
+          const attackAmount = ethers.parseEther(depositAmount.toString());
+          const attackTx = await attackerContract
+            .connect(attackerSigner)
+            .attack({ value: attackAmount });
+          await attackTx.wait();
 
-  // Check balances after the attack
-  bankBalance = await ethers.provider.getBalance(bankAddress);
-  const attackerBalance = await ethers.provider.getBalance(attackerAddress);
+          // Check if the bank is significantly drained (allowing for some remaining dust)
+          const bankBalance = await ethers.provider.getBalance(bankAddress);
+          const attackerBalance = await ethers.provider.getBalance(
+            await attackerContract.getAddress()
+          );
 
-  console.log(`Bank balance after attack: ${ethers.formatEther(bankBalance)} ETH`);
-  console.log(`Attacker contract balance after attack: ${ethers.formatEther(attackerBalance)} ETH`);
-
-  if (bankBalance < ethers.parseEther("1.0")) {
-    console.log("\n✅ Attack successful! The bank has been drained.");
-  } else {
-    console.log("\n❌ Attack failed.");
-  }
-}
-
-main().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
+          // The bank should be drained or have very little left (less than the attack amount)
+          expect(bankBalance).to.be.lessThan(attackAmount);
+          // The attacker should have received at least 10 ETH (the initial bank funding)
+          expect(attackerBalance).to.be.greaterThanOrEqual(
+            ethers.parseEther("10.0")
+          );
+        }
+      )
+    );
+  }).timeout(20000); // Increase timeout for fuzz testing
 });
