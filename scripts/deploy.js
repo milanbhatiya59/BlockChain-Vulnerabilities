@@ -700,6 +700,10 @@ async function main() {
 
   console.log("\nDeploying Victim Contracts...");
 
+  // Get signers for processor role
+  const signers = await ethers.getSigners();
+  const processor = signers[2]; // Use third signer as processor
+
   // Deploy FragileEscrow
   const FragileEscrow = await ethers.getContractFactory("FragileEscrow");
   const fragileEscrow = await FragileEscrow.deploy(processor.address);
